@@ -1,11 +1,24 @@
 output "instance_public_ip" {
-  value = module.compute.public_ip
+  description = "Public IP address of the Boom application instance"
+  value       = module.compute.public_ip
+}
+
+output "instance_id" {
+  description = "OCI instance OCID"
+  value       = module.compute.instance_id
 }
 
 output "ssh_command" {
-  value = "ssh ubuntu@${module.compute.public_ip}"
+  description = "SSH command to access the instance"
+  value       = "ssh ubuntu@${module.compute.public_ip}"
 }
 
 output "vcn_id" {
-  value = module.network.vcn_id
+  description = "VCN OCID"
+  value       = module.network.vcn_id
+}
+
+output "resource_prefix" {
+  description = "Resource naming prefix"
+  value       = local.resource_prefix
 }

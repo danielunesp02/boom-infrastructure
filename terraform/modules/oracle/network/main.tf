@@ -3,6 +3,8 @@ resource "oci_core_vcn" "main" {
   cidr_block     = var.vcn_cidr
   display_name   = "${var.name_prefix}-vcn"
   dns_label      = "boom"
+
+  freeform_tags = var.common_tags
 }
 
 resource "oci_core_internet_gateway" "main" {
@@ -10,6 +12,8 @@ resource "oci_core_internet_gateway" "main" {
   vcn_id         = oci_core_vcn.main.id
   display_name   = "${var.name_prefix}-igw"
   enabled        = true
+
+  freeform_tags = var.common_tags
 }
 
 resource "oci_core_route_table" "public" {
@@ -22,6 +26,8 @@ resource "oci_core_route_table" "public" {
     destination_type  = "CIDR_BLOCK"
     network_entity_id = oci_core_internet_gateway.main.id
   }
+
+  freeform_tags = var.common_tags
 }
 
 resource "oci_core_security_list" "public" {
@@ -67,6 +73,8 @@ resource "oci_core_security_list" "public" {
     destination = "0.0.0.0/0"
     description = "Allow all outbound traffic"
   }
+
+  freeform_tags = var.common_tags
 }
 
 resource "oci_core_subnet" "public" {
@@ -78,4 +86,6 @@ resource "oci_core_subnet" "public" {
   route_table_id             = oci_core_route_table.public.id
   security_list_ids          = [oci_core_security_list.public.id]
   prohibit_public_ip_on_vnic = false
+
+  freeform_tags = var.common_tags
 }

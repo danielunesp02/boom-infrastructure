@@ -36,4 +36,6 @@ resource "oci_core_instance" "app" {
     ssh_authorized_keys = var.ssh_public_key
     user_data           = base64encode(file("${path.root}/cloud-init.yaml"))
   }
+
+  freeform_tags = var.common_tags
 }

@@ -10,12 +10,18 @@ variable "name_prefix" {
 
 variable "vcn_cidr" {
   type        = string
-  default     = "10.0.0.0/16"
   description = "VCN CIDR block"
+  default     = "10.0.0.0/16"
 }
 
 variable "public_subnet_cidr" {
   type        = string
-  default     = "10.0.1.0/24"
   description = "Public subnet CIDR block"
+  default     = "10.0.1.0/24"
+}
+
+variable "common_tags" {
+  type        = map(string)
+  description = "Common resource tags"
+  default     = {}
 }

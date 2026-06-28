@@ -1,7 +1,9 @@
 output "vcn_id" {
-  value = oci_core_vcn.main.id
+  description = "VCN OCID"
+  value       = oci_core_vcn.main.id
 }
 
 output "public_subnet_id" {
-  value = oci_core_subnet.public.id
+  description = "Public subnet OCID"
+  value       = oci_core_subnet.public.id
 }
