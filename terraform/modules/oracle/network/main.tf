@@ -35,14 +35,18 @@ resource "oci_core_security_list" "public" {
   vcn_id         = oci_core_vcn.main.id
   display_name   = "${var.name_prefix}-public-sl"
 
-  ingress_security_rules {
-    protocol    = "6"
-    source      = "0.0.0.0/0"
-    description = "SSH"
+  dynamic "ingress_security_rules" {
+    for_each = var.allowed_ssh_cidrs
 
-    tcp_options {
-      min = 22
-      max = 22
+    content {
+      protocol    = "6"
+      source      = ingress_security_rules.value
+      description = "SSH"
+
+      tcp_options {
+        min = 22
+        max = 22
+      }
     }
   }
 

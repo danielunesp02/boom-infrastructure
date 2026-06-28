@@ -49,29 +49,51 @@ fi
 
 SSH_PUBLIC_KEY="$(cat "${SSH_PUBLIC_KEY_PATH}")"
 
+echo "[INFO] Discovering your public IP for SSH allowlist..."
+PUBLIC_IP="$(curl -fsS https://api.ipify.org || true)"
+
+if [[ -z "${PUBLIC_IP}" ]]; then
+  echo "[WARN] Could not discover public IP automatically."
+  echo "[WARN] SSH will be temporarily open to 0.0.0.0/0. Please edit terraform.tfvars manually."
+  SSH_CIDR="0.0.0.0/0"
+else
+  SSH_CIDR="${PUBLIC_IP}/32"
+fi
+
 mkdir -p "${TF_DIR}"
 
-cat > "${TFVARS_FILE}" <<EOF2
+cat > "${TFVARS_FILE}" <<EOF
 tenancy_ocid     = "${TENANCY_OCID}"
 user_ocid        = "${USER_OCID}"
 fingerprint      = "${FINGERPRINT}"
 private_key_path = "${PRIVATE_KEY_PATH}"
 region           = "${REGION}"
 
-compartment_ocid    = "${TENANCY_OCID}"
+# Initially use the tenancy OCID as the parent/fallback compartment.
+# Terraform will create a dedicated project compartment when create_project_compartment = true.
+compartment_ocid = "${TENANCY_OCID}"
+
 availability_domain = "${AD_NAME}"
 
 ssh_public_key = "${SSH_PUBLIC_KEY}"
 
 project_name = "boom"
 environment  = "dev"
-EOF2
+
+create_project_compartment = true
+project_compartment_name   = "Boom"
+
+allowed_ssh_cidrs = [
+  "${SSH_CIDR}"
+]
+EOF
 
 chmod 600 "${TFVARS_FILE}"
 
 echo "[OK] Generated ${TFVARS_FILE}"
 echo "region: ${REGION}"
 echo "availability_domain: ${AD_NAME}"
+echo "ssh_cidr: ${SSH_CIDR}"
 echo "private_key_path: ${PRIVATE_KEY_PATH}"
 echo
 echo "Next:"

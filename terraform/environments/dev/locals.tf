@@ -10,4 +10,6 @@ locals {
     ManagedBy   = "Terraform"
     Owner       = "Daniel Bevilacqua"
   }
+
+  target_compartment_ocid = var.create_project_compartment ? module.project_compartment[0].compartment_id : var.compartment_ocid
 }

@@ -1,3 +1,8 @@
+output "project_compartment_id" {
+  description = "Project compartment OCID"
+  value       = local.target_compartment_ocid
+}
+
 output "instance_public_ip" {
   description = "Public IP address of the Boom application instance"
   value       = module.compute.public_ip

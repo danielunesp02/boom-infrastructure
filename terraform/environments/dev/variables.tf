@@ -25,7 +25,7 @@ variable "region" {
 
 variable "compartment_ocid" {
   type        = string
-  description = "OCI compartment OCID. For small setups, this may be the tenancy OCID."
+  description = "Fallback OCI compartment OCID. For small setups, this may be the tenancy OCID."
 }
 
 variable "availability_domain" {
@@ -48,6 +48,23 @@ variable "environment" {
   type        = string
   description = "Environment name"
   default     = "dev"
+}
+
+variable "create_project_compartment" {
+  type        = bool
+  description = "Whether Terraform should create a dedicated project compartment"
+  default     = true
+}
+
+variable "project_compartment_name" {
+  type        = string
+  description = "Dedicated project compartment name"
+  default     = "Boom"
+}
+
+variable "allowed_ssh_cidrs" {
+  type        = list(string)
+  description = "CIDR blocks allowed to access SSH"
 }
 
 variable "instance_shape" {

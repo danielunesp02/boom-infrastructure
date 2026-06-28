@@ -20,6 +20,12 @@ variable "public_subnet_cidr" {
   default     = "10.0.1.0/24"
 }
 
+variable "allowed_ssh_cidrs" {
+  type        = list(string)
+  description = "CIDR blocks allowed to access SSH"
+  default     = []
+}
+
 variable "common_tags" {
   type        = map(string)
   description = "Common resource tags"
