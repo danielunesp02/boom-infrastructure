@@ -1,0 +1,11 @@
+output "instance_public_ip" {
+  value = module.compute.public_ip
+}
+
+output "ssh_command" {
+  value = "ssh ubuntu@${module.compute.public_ip}"
+}
+
+output "vcn_id" {
+  value = module.network.vcn_id
+}
