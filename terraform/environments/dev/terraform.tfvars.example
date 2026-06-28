@@ -7,7 +7,7 @@ region           = "sa-saopaulo-1"
 compartment_ocid    = "ocid1.compartment.oc1..example"
 availability_domain = "EXAMPLE:SA-SAOPAULO-1-AD-1"
 
-ssh_public_key = "ssh-rsa AAAA..."
+ssh_public_key = "ssh-ed25519 AAAA..."
 
 project_name = "boom"
 environment  = "dev"

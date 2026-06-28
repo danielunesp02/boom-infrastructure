@@ -1,39 +1,69 @@
 SHELL := /bin/bash
-TF_DEV_DIR=terraform/environments/dev
 
-.PHONY: help tf-init tf-fmt tf-validate tf-plan tf-apply local-up local-down check-tools
+LOCAL_TF_DIR=terraform/environments/local
+ORACLE_TF_DIR=terraform/environments/dev
 
+.PHONY: help
 help:
-	@echo "Boom Infrastructure commands"
-	@echo "  make tf-init"
-	@echo "  make tf-fmt"
-	@echo "  make tf-validate"
-	@echo "  make tf-plan"
-	@echo "  make tf-apply"
+	@echo "Boom Infrastructure"
+	@echo ""
+	@echo "Local:"
+	@echo "  make local-init"
+	@echo "  make local-plan"
 	@echo "  make local-up"
 	@echo "  make local-down"
+	@echo "  make local-status"
+	@echo ""
+	@echo "Oracle:"
+	@echo "  make oracle-init"
+	@echo "  make oracle-plan"
+	@echo "  make oracle-apply"
+	@echo "  make oracle-destroy"
+	@echo ""
+	@echo "General:"
+	@echo "  make tf-fmt"
 	@echo "  make check-tools"
 
-tf-init:
-	cd $(TF_DEV_DIR) && terraform init
+.PHONY: local-init
+local-init:
+	cd $(LOCAL_TF_DIR) && terraform init
 
+.PHONY: local-plan
+local-plan:
+	cd $(LOCAL_TF_DIR) && terraform plan
+
+.PHONY: local-up
+local-up:
+	cd $(LOCAL_TF_DIR) && terraform apply -auto-approve
+
+.PHONY: local-down
+local-down:
+	cd $(LOCAL_TF_DIR) && terraform destroy -auto-approve
+
+.PHONY: local-status
+local-status:
+	docker ps --filter "name=boom-"
+
+.PHONY: oracle-init
+oracle-init:
+	cd $(ORACLE_TF_DIR) && terraform init
+
+.PHONY: oracle-plan
+oracle-plan:
+	cd $(ORACLE_TF_DIR) && terraform plan
+
+.PHONY: oracle-apply
+oracle-apply:
+	cd $(ORACLE_TF_DIR) && terraform apply
+
+.PHONY: oracle-destroy
+oracle-destroy:
+	cd $(ORACLE_TF_DIR) && terraform destroy
+
+.PHONY: tf-fmt
 tf-fmt:
 	terraform fmt -recursive terraform
 
-tf-validate:
-	cd $(TF_DEV_DIR) && terraform validate
-
-tf-plan:
-	cd $(TF_DEV_DIR) && terraform plan
-
-tf-apply:
-	cd $(TF_DEV_DIR) && terraform apply
-
-local-up:
-	docker compose -f docker/local/docker-compose.yml up -d
-
-local-down:
-	docker compose -f docker/local/docker-compose.yml down
-
+.PHONY: check-tools
 check-tools:
 	./scripts/local/check-tools.sh

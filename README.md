@@ -1,43 +1,47 @@
 # Boom Infrastructure
 
-Infrastructure repository for the Boom learning platform.
-
-## Goals
-
-- Reproducible infrastructure
-- Cost-conscious cloud deployment
-- Oracle Cloud Always Free first
-- Docker-first runtime
-- Terraform-managed infrastructure
-- GitHub Actions validation
-
-## Initial Architecture
+This repository supports two official execution modes:
 
 ```text
-Oracle Cloud Infrastructure
-  ├── VCN
-  ├── Public Subnet
-  ├── Internet Gateway
-  ├── Route Table
-  ├── Security List
-  └── Ampere A1 Compute Instance
-        ├── Docker
-        ├── Docker Compose
-        ├── Nginx
-        ├── PostgreSQL
-        └── Boom API
+local  -> Docker containers created locally
+dev    -> Oracle Cloud Infrastructure using Terraform
 ```
 
-## First Setup
+## Local mode
+
+Use this when developing on your Mac.
+
+```bash
+make local-up
+make local-status
+make local-down
+```
+
+Services:
+
+- PostgreSQL: `localhost:5432`
+- pgAdmin: `http://localhost:5050`
+- Nginx: `http://localhost:8088`
+
+## Oracle dev mode
+
+Use this when provisioning the development environment in Oracle Cloud.
 
 ```bash
 cd terraform/environments/dev
 cp terraform.tfvars.example terraform.tfvars
-terraform init
-terraform fmt
-terraform validate
-terraform plan
-terraform apply
+# fill terraform.tfvars
+cd ../../..
+make oracle-init
+make oracle-plan
+make oracle-apply
 ```
 
-Never commit `terraform.tfvars`, `.env`, private keys or OCI API keys.
+## Important
+
+Do not commit:
+
+- `terraform.tfvars`
+- `.env`
+- private keys
+- OCI API keys

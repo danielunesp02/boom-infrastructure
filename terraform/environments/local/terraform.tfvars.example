@@ -1,0 +1,12 @@
+project_name = "boom"
+
+postgres_db       = "boom"
+postgres_user     = "boom"
+postgres_password = "boom"
+postgres_port     = 5432
+
+pgadmin_email    = "admin@boom.local"
+pgadmin_password = "admin"
+pgadmin_port     = 5050
+
+nginx_port = 8088
