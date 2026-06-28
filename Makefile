@@ -1,68 +1,77 @@
 SHELL := /bin/bash
 
-LOCAL_TF_DIR=terraform/environments/local
-ORACLE_TF_DIR=terraform/environments/dev
+COMPOSE_FILE=docker/compose/docker-compose.yml
+ENV_FILE=docker/compose/.env
 
 .PHONY: help
 help:
 	@echo "Boom Infrastructure"
 	@echo ""
-	@echo "Local:"
-	@echo "  make local-init"
-	@echo "  make local-plan"
-	@echo "  make local-up"
-	@echo "  make local-down"
-	@echo "  make local-status"
+	@echo "Local commands:"
+	@echo "  make init-local     Create local .env file if missing"
+	@echo "  make up             Start local infrastructure"
+	@echo "  make down           Stop local infrastructure"
+	@echo "  make restart        Restart local infrastructure"
+	@echo "  make ps             Show local containers"
+	@echo "  make logs           Show local logs"
+	@echo "  make test-local     Validate local services"
 	@echo ""
-	@echo "Oracle:"
+	@echo "Terraform / Oracle:"
+	@echo "  make tf-fmt"
 	@echo "  make oracle-init"
 	@echo "  make oracle-plan"
 	@echo "  make oracle-apply"
-	@echo "  make oracle-destroy"
 	@echo ""
-	@echo "General:"
-	@echo "  make tf-fmt"
+	@echo "Developer:"
 	@echo "  make check-tools"
 
-.PHONY: local-init
-local-init:
-	cd $(LOCAL_TF_DIR) && terraform init
+.PHONY: init-local
+init-local:
+	@if [ ! -f $(ENV_FILE) ]; then \
+		cp docker/compose/.env.example $(ENV_FILE); \
+		echo "Created $(ENV_FILE)"; \
+	else \
+		echo "$(ENV_FILE) already exists"; \
+	fi
 
-.PHONY: local-plan
-local-plan:
-	cd $(LOCAL_TF_DIR) && terraform plan
+.PHONY: up
+up: init-local
+	docker compose --env-file $(ENV_FILE) -f $(COMPOSE_FILE) up -d
 
-.PHONY: local-up
-local-up:
-	cd $(LOCAL_TF_DIR) && terraform apply -auto-approve
+.PHONY: down
+down:
+	docker compose --env-file $(ENV_FILE) -f $(COMPOSE_FILE) down
 
-.PHONY: local-down
-local-down:
-	cd $(LOCAL_TF_DIR) && terraform destroy -auto-approve
+.PHONY: restart
+restart: down up
 
-.PHONY: local-status
-local-status:
-	docker ps --filter "name=boom-"
+.PHONY: ps
+ps:
+	docker compose --env-file $(ENV_FILE) -f $(COMPOSE_FILE) ps
 
-.PHONY: oracle-init
-oracle-init:
-	cd $(ORACLE_TF_DIR) && terraform init
+.PHONY: logs
+logs:
+	docker compose --env-file $(ENV_FILE) -f $(COMPOSE_FILE) logs -f
 
-.PHONY: oracle-plan
-oracle-plan:
-	cd $(ORACLE_TF_DIR) && terraform plan
-
-.PHONY: oracle-apply
-oracle-apply:
-	cd $(ORACLE_TF_DIR) && terraform apply
-
-.PHONY: oracle-destroy
-oracle-destroy:
-	cd $(ORACLE_TF_DIR) && terraform destroy
+.PHONY: test-local
+test-local:
+	./scripts/local/test-local.sh
 
 .PHONY: tf-fmt
 tf-fmt:
 	terraform fmt -recursive terraform
+
+.PHONY: oracle-init
+oracle-init:
+	cd terraform/environments/dev && terraform init
+
+.PHONY: oracle-plan
+oracle-plan:
+	cd terraform/environments/dev && terraform plan
+
+.PHONY: oracle-apply
+oracle-apply:
+	cd terraform/environments/dev && terraform apply
 
 .PHONY: check-tools
 check-tools:

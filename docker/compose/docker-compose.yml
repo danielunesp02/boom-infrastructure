@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: boom-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-boom}
+      POSTGRES_USER: ${POSTGRES_USER:-boom}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-boom}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - boom_postgres_data:/var/lib/postgresql/data
+    networks:
+      - boom-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-boom} -d ${POSTGRES_DB:-boom}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: boom-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@boom.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - boom-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: boom-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-8088}:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - boom-network
+
+networks:
+  boom-network:
+    name: boom-network
+
+volumes:
+  boom_postgres_data:
+    name: boom-postgres-data
