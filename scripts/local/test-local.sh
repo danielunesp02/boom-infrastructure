@@ -2,8 +2,14 @@
 set -euo pipefail
 
 echo "Testing Boom local infrastructure..."
-
 echo
+
+if ! docker info >/dev/null 2>&1; then
+  echo "[ERROR] Docker daemon is not running."
+  echo "Start Docker Desktop, Colima, or another Docker daemon first."
+  exit 1
+fi
+
 echo "Docker containers:"
 docker ps --filter "name=boom-" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
@@ -24,6 +30,15 @@ if [[ "$POSTGRES_STATUS" == "healthy" ]]; then
   echo "[OK] PostgreSQL is healthy"
 else
   echo "[WARN] PostgreSQL health status: ${POSTGRES_STATUS}"
+fi
+
+echo
+echo "Testing Redis container health..."
+REDIS_STATUS="$(docker inspect --format='{{.State.Health.Status}}' boom-redis 2>/dev/null || true)"
+if [[ "$REDIS_STATUS" == "healthy" ]]; then
+  echo "[OK] Redis is healthy"
+else
+  echo "[WARN] Redis health status: ${REDIS_STATUS}"
 fi
 
 echo
